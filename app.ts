@@ -53,7 +53,7 @@ app.use(cookieParser());
 // cors => cross origin resource sharing
 app.use(
   cors({
-    origin: ["http://localhost:3001","https://lms-ui-web.vercel.app","http://localhost:5555"],
+    origin: ["http://localhost:3001","https://lms-fe-neon.vercel.app","http://localhost:5555"],
     credentials: true,
   })
 );
