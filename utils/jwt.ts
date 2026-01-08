@@ -36,9 +36,6 @@ export const sendToken = (user: IUser, statusCode: number, res: Response) => {
     const accessToken = user.SignAccessToken();
     const refreshToken = user.SignRefreshToken();
 
-
-
-
     res.cookie("access_token", accessToken, accessTokenOptions);
     res.cookie("refresh_token", refreshToken, refreshTokenOptions);
 

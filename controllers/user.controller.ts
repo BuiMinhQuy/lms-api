@@ -257,7 +257,13 @@ export const loginUser = CatchAsyncError(async (req: Request, res: Response, nex
 
         if (!user) {
             return next(new ErrorHandler("Invalid email or password", 400));
-        };
+        }
+
+        // Check if user has a password (not social auth user)
+        if (!user.password) {
+            return next(new ErrorHandler("This account was created with social login. Please use social login instead.", 400));
+        }
+
         // if(password == user.password){
         //     sendToken(user, 200, res);
 

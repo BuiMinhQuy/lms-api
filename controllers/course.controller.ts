@@ -280,7 +280,9 @@ export const addAnswer = CatchAsyncError(
         });
       } else {
         const data = {
+          user: {
           name: question.user.name,
+          },
           title: courseContent.title,
         };
         const html = await ejs.renderFile(

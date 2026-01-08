@@ -20,6 +20,8 @@ import analyticsRouter from "./routes/analytics.route";
 import layoutRouter from "./routes/layout.route";
 import aiRouter from "./routes/ai.route";
 import uploadRouter from "./routes/uploadVideo.route";
+import stripeRouter from "./routes/stripe.route";
+import { stripeWebhook } from "./controllers/stripe.controller";
 
 // const server = createServer(app);
 // const io = new Server(server, {
@@ -43,6 +45,9 @@ import uploadRouter from "./routes/uploadVideo.route";
 //   });
 // });
 
+// Stripe webhook must be registered BEFORE express.json() middleware
+// because Stripe needs raw body for signature verification
+app.post("/api/v1/stripe/webhook", express.raw({ type: 'application/json' }), stripeWebhook);
 
 // body parser
 app.use(express.json({ limit: "1000mb" }));
@@ -53,7 +58,7 @@ app.use(cookieParser());
 // cors => cross origin resource sharing
 app.use(
   cors({
-    origin: ["http://localhost:3001","https://lms-fe-neon.vercel.app","http://localhost:5555"],
+    origin: ["http://localhost:3001","https://lms-fe-neon.vercel.app","http://localhost:5555","https://c904e8635a4a.ngrok-free.app"	],
     credentials: true,
   })
 );
@@ -76,6 +81,7 @@ app.use("/api/v1", analyticsRouter);
 app.use("/api/v1", layoutRouter);
 app.use("/api/v1", aiRouter);
 app.use("/api/v1", uploadRouter);
+app.use("/api/v1", stripeRouter);
 
 app.get("/test", (req, res, next) => {
   res.status(200).json({

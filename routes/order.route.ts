@@ -1,6 +1,7 @@
 import express from 'express';
 import { authorizeRoles, isAuthenticated } from '../middleware/auth';
 import { createOrder, getAllOrders, newPayment, sendStripePublishableKey } from '../controllers/order.controller';
+import { createPayOSPayment, payOSWebhook, checkPaymentStatus } from '../controllers/payos.controller';
 import { updateAccessToken } from '../controllers/user.controller';
 const orderRouter = express.Router();
 
@@ -21,7 +22,9 @@ orderRouter.get(
 orderRouter.get("/payment/stripepublishablekey",sendStripePublishableKey);
 orderRouter.post("/payment",isAuthenticated,newPayment);
 
-
-
+// PayOS Routes
+orderRouter.post("/payos/create-payment", isAuthenticated, createPayOSPayment);
+orderRouter.post("/payos/webhook", payOSWebhook); // No authentication needed for webhook
+orderRouter.get("/payos/check-status", isAuthenticated, checkPaymentStatus);
 
 export default orderRouter;
