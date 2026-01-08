@@ -438,7 +438,7 @@ export const payOSWebhook = CatchAsyncError(
                     await user.save();
                 }
 
-                // Send confirmation email
+                // Send confirmation email (non-blocking - don't wait for it)
                 const mailData = {
                     order: {
                         _id: course._id.toString().slice(0, 6),
@@ -452,17 +452,18 @@ export const payOSWebhook = CatchAsyncError(
                     },
                 };
 
-                try {
-                    await sendMail({
-                        email: user.email,
-                        subject: "Order Confirmation",
-                        template: "order-confirmation.ejs",
-                        data: mailData,
-                    });
-                } catch (emailError: any) {
-                    console.error("Failed to send email:", emailError.message);
-                    // Don't fail the webhook if email fails
-                }
+                // Send email in background, don't block webhook processing
+                sendMail({
+                    email: user.email,
+                    subject: "Order Confirmation",
+                    template: "order-confirmation.ejs",
+                    data: mailData,
+                }).catch((emailError: any) => {
+                    // Silently handle email errors - don't spam logs
+                    // Email failure doesn't affect webhook processing
+                    // Uncomment below if you need to debug email issues:
+                    // console.warn("[EMAIL] Failed to send confirmation email:", emailError.message);
+                });
 
                 // Create notification
                 const notification = await NotificationModel.create({

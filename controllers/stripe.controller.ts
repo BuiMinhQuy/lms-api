@@ -175,8 +175,10 @@ export const stripeWebhook = CatchAsyncError(async (req: Request, res: Response,
                     data: mailData
                 });
             } catch (emailError: any) {
-                console.error('Failed to send email:', emailError.message);
-                // Don't fail the webhook if email fails
+                // Silently handle email errors - don't spam logs
+                // Email failure doesn't affect webhook processing
+                // Uncomment below if you need to debug email issues:
+                // console.warn('Failed to send email:', emailError.message);
             }
 
             // Create notification
