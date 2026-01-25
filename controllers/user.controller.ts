@@ -551,6 +551,55 @@ export const updateUserRole = CatchAsyncError(async (req: Request, res: Response
     }
 });
 
+// update user info by admin (name/email/role/isVerified)
+interface IAdminUpdateUserBody {
+    name?: string;
+    email?: string;
+    role?: string;
+    isVerified?: boolean;
+}
+
+export const adminUpdateUser = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { id } = req.params;
+        const { name, email, role, isVerified } = req.body as IAdminUpdateUserBody;
+
+        const user = await userModel.findById(id);
+        if (!user) {
+            return next(new ErrorHandler("User not found", 404));
+        }
+
+        if (email && email !== user.email) {
+            const isEmailExist = await userModel.findOne({ email });
+            if (isEmailExist) {
+                return next(new ErrorHandler("Email already exist", 400));
+            }
+            user.email = email;
+        }
+
+        if (typeof name === "string" && name.trim()) {
+            user.name = name.trim();
+        }
+
+        if (typeof role === "string" && role.trim()) {
+            user.role = role.trim();
+        }
+
+        if (typeof isVerified === "boolean") {
+            user.isVerified = isVerified;
+        }
+
+        await user.save();
+
+        res.status(200).json({
+            success: true,
+            user,
+        });
+    } catch (error: any) {
+        return next(new ErrorHandler(error.message, 500));
+    }
+});
+
 // delete user -- only for admin 
 
 export const deleteUser = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
@@ -561,7 +610,7 @@ export const deleteUser = CatchAsyncError(async (req: Request, res: Response, ne
         if (!user) {
             return next(new ErrorHandler("User not found", 404));
         }
-        await user.deleteOne({ id });
+        await userModel.findByIdAndDelete(id);
         res.status(200).json({
             status: true,
             message: "User deleted successfully"

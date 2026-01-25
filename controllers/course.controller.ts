@@ -430,12 +430,13 @@ export const deleteCourse = CatchAsyncError(
       const course = await CourseModel.findById(id);
 
       if (!course) {
-        return next(new ErrorHandler("User not found", 404));
+        return next(new ErrorHandler("Course not found", 404));
       }
-      await course.deleteOne({ id });
+      // Delete by _id (safe + consistent)
+      await CourseModel.findByIdAndDelete(id);
       res.status(200).json({
         status: true,
-        message: "User deleted successfully",
+        message: "Course deleted successfully",
       });
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 500));

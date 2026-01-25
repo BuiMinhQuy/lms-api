@@ -1,4 +1,4 @@
-import { activateUser, deleteUser, forgotPassword, getAllUsers, getUserInfo, loginUser, logoutUser, registrationUser, socialAuth, updateAccessToken, updatePassword, updateProfilePicture, updateUserInfo, updateUserRole, verifyForgotPassword } from '../controllers/user.controller';
+import { activateUser, adminUpdateUser, deleteUser, forgotPassword, getAllUsers, getUserInfo, loginUser, logoutUser, registrationUser, socialAuth, updateAccessToken, updatePassword, updateProfilePicture, updateUserInfo, updateUserRole, verifyForgotPassword } from '../controllers/user.controller';
 import express from 'express';
 import { authorizeRoles, isAuthenticated } from '../middleware/auth';
 import { access } from 'fs';
@@ -96,11 +96,20 @@ router.put(
 );
 //only -- admin
 router.delete(
-    '/delete-user',
+    '/delete-user/:id',
     updateAccessToken,
     isAuthenticated,
     authorizeRoles("admin"),
     deleteUser
+);
+
+// only -- admin (update user profile by id)
+router.put(
+    '/admin/update-user/:id',
+    updateAccessToken,
+    isAuthenticated,
+    authorizeRoles("admin"),
+    adminUpdateUser
 );
 
 
